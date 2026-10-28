@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a1524">
+<title>MOBA Expert — Word Trial</title>
+<style>
+:root{
+  /* Deep navy-blue base */
+  --bg:#0a1524;
+  --bg-soft:#0f1d30;
+  --panel:#142338;
+  --panel-hi:#1a2d47;
+  --line:#1f3458;
+  --line-hi:#2a4877;
+  --text:#e4edf9;
+  --muted:#8299bb;
+
+  /* Primary blue accent */
+  --blue:#4dabf7;
+  --blue-bright:#74c0fc;
+  --blue-soft:#d0e7ff;
+  --blue-dim:#2b5e9e;
+  --blue-bg:rgba(77,171,247,.10);
+  --blue-bg-hi:rgba(77,171,247,.18);
+
+  /* Warm gold — reserved for achievement numbers */
+  --gold:#f5c76a;
+  --gold-soft:#ffe1a3;
+  --gold-dim:#8a6d2f;
+
+  /* Semantic */
+  --jade:#63e6be;
+  --jade-bg:rgba(99,230,190,.15);
+  --red:#ff7a6b;
+  --red-bg:rgba(255,122,107,.12);
+
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;
+  background:
+    radial-gradient(900px 500px at 80% -200px, rgba(77,171,247,.16), transparent 70%),
+    radial-gradient(700px 500px at 15% 105%, rgba(245,199,106,.05), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;color:inherit}
+
+/* ---------- TOP BAR ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:10px 18px;
+  background:rgba(10,21,36,.9);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.brand{
+  font-family:var(--serif);font-size:.95rem;letter-spacing:.04em;
+  color:var(--blue-soft);white-space:nowrap;line-height:1.15;
+  text-transform:uppercase;
+}
+.brand span{
+  display:block;font-family:var(--sans);font-size:.52rem;
+  letter-spacing:.26em;text-transform:uppercase;
+  color:var(--muted);margin-top:2px;font-weight:600;
+}
+.stats{display:flex;gap:14px;margin-left:auto;flex-wrap:wrap;align-items:center}
+.stat{display:flex;flex-direction:column;align-items:flex-end;min-width:38px}
+.stat .k{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stat .v{font-family:var(--serif);font-size:1rem;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.2;font-weight:600}
+.stat .v.hearts{color:var(--red);letter-spacing:.06em;font-size:.92rem;font-weight:400}
+
+/* ---------- MAIN ---------- */
+main{max-width:780px;margin:0 auto;padding:26px 18px 80px}
+.screen{display:none}
+.screen.on{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* Start screen title */
+.start-title{
+  font-family:var(--serif);font-weight:600;
+  font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.1;
+  margin:0 0 4px;
+  background:linear-gradient(180deg,#eaf4ff 0%, #b5d9ff 45%, #4dabf7 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:.01em;
+}
+.start-sub{
+  font-family:var(--serif);font-style:italic;color:var(--muted);
+  margin:0 0 22px;font-size:.96rem;
+}
+
+/* ---------- ACCORDION ---------- */
+#modeAccordion{display:grid;gap:10px;margin-bottom:22px}
+.mode-item{
+  background:var(--panel);border:1px solid var(--line);border-radius:13px;
+  overflow:hidden;transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.mode-item:hover{border-color:var(--line-hi)}
+.mode-item.open{
+  border-color:var(--blue-dim);
+  background:rgba(77,171,247,.04);
+  box-shadow:0 0 0 1px rgba(77,171,247,.08) inset;
+}
+.mode-header{
+  display:flex;align-items:center;gap:13px;width:100%;
+  padding:14px 16px;background:transparent;border:none;
+  color:inherit;text-align:left;cursor:pointer;
+}
+.mode-icon{
+  width:38px;height:38px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(180deg, var(--blue-bg-hi), var(--blue-bg));
+  border:1px solid var(--blue-dim);
+  color:var(--blue-bright);
+  display:grid;place-items:center;font-size:1.08rem;font-weight:700;
+  transition:.2s ease;
+}
+.mode-item.open .mode-icon{
+  background:linear-gradient(180deg, rgba(77,171,247,.28), rgba(77,171,247,.14));
+  border-color:var(--blue);
+  color:#fff;
+  box-shadow:0 0 14px rgba(77,171,247,.25);
+}
+.mode-title-wrap{flex:1;min-width:0}
+.mode-title-wrap h3{
+  margin:0;font-family:var(--serif);font-size:1.02rem;font-weight:600;color:#f0f6fc;
+}
+.mode-tagline{margin:2px 0 0;font-size:.8rem;color:var(--muted);line-height:1.4}
+.mode-chevron{
+  color:var(--muted);transition:transform .25s ease, color .25s ease;font-size:.95rem;
+}
+.mode-item.open .mode-chevron{transform:rotate(180deg);color:var(--blue-bright)}
+
+.mode-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}
+.mode-item.open .mode-body{grid-template-rows:1fr}
+.mode-body-inner{min-height:0;overflow:hidden;padding:0 16px}
+.mode-item.open .mode-body-inner{padding:0 16px 16px}
+.mode-rules{
+  list-style:none;padding:12px 0 0;margin:0 0 12px;
+  border-top:1px solid var(--line);
+}
+.mode-rules li{
+  position:relative;padding-left:16px;
+  font-size:.85rem;color:#c8d2de;line-height:1.55;margin-bottom:5px;
+}
+.mode-rules li::before{
+  content:"";position:absolute;left:0;top:.72em;
+  width:5px;height:5px;border-radius:50%;
+  background:var(--blue);
+  box-shadow:0 0 6px rgba(77,171,247,.6);
+}
+.mode-best{
+  font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin:0 0 12px;
+}
+.mode-best b{color:var(--gold);font-size:.86rem;letter-spacing:.04em}
+.mode-body-inner .btn{width:100%}
+
+/* ---------- BUTTONS ---------- */
+.btn{
+  padding:11px 18px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--text);
+  font-size:.86rem;letter-spacing:.02em;cursor:pointer;transition:.15s ease;
+}
+.btn:hover:not(:disabled){
+  border-color:var(--blue-dim);
+  background:var(--blue-bg);
+  color:var(--blue-soft);
+}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.primary{
+  border-color:var(--blue);
+  background:linear-gradient(180deg, rgba(77,171,247,.26), rgba(77,171,247,.12));
+  color:#eaf4ff;font-weight:600;
+  box-shadow:0 2px 14px rgba(77,171,247,.15);
+}
+.btn.primary:hover:not(:disabled){
+  background:linear-gradient(180deg, rgba(77,171,247,.38), rgba(77,171,247,.20));
+  color:#fff;
+  box-shadow:0 2px 20px rgba(77,171,247,.3);
+}
+.btn.danger:hover:not(:disabled){
+  border-color:var(--red);background:var(--red-bg);color:#ffd2cc;
+}
+.btn.small{padding:7px 13px;font-size:.76rem}
+
+/* ---------- GAME ---------- */
+.stagehead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.modename{font-family:var(--serif);font-size:1.08rem;color:#f0f6fc}
+.roundinfo{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+.hintbox{
+  background:linear-gradient(180deg, rgba(77,171,247,.10), rgba(77,171,247,.02));
+  border:1px solid var(--blue-dim);
+  border-left:3px solid var(--blue);
+  border-radius:0 10px 10px 0;
+  padding:13px 16px;margin-bottom:22px;
+  font-family:var(--serif);font-size:.98rem;
+  color:#d6e8ff;line-height:1.55;
+}
+
+/* Scramble */
+.slots{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:6px 0 22px;min-height:42px}
+.slot{
+  width:30px;height:40px;border-radius:7px;
+  border:1px solid var(--line);background:var(--panel);
+  display:grid;place-items:center;
+  font-family:var(--serif);font-size:1.05rem;color:var(--blue-soft);
+}
+.slot.filled{
+  border-color:var(--blue-dim);
+  background:var(--blue-bg);
+  color:#eaf4ff;
+}
+.slot.next{
+  border-color:var(--blue);
+  box-shadow:0 0 0 2px rgba(77,171,247,.16) inset;
+}
+.tiles{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.tile{
+  width:40px;height:40px;border-radius:8px;
+  border:1px solid var(--line);background:var(--panel);color:var(--text);
+  font-family:var(--serif);font-size:1.02rem;
+  cursor:pointer;transition:.14s ease;
+}
+.tile:hover:not(:disabled){
+  border-color:var(--blue-dim);
+  background:var(--blue-bg);
+  color:var(--blue-soft);
+  transform:translateY(-2px);
+}
+.tile:disabled{opacity:.2;cursor:default;transform:none}
+.slotctl{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+
+/* Letters */
+.word{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:8px 0 14px;min-height:44px}
+.letter{
+  width:26px;height:42px;border-bottom:2px solid var(--blue-dim);
+  display:grid;place-items:center;
+  font-family:var(--serif);font-size:1.18rem;color:var(--blue-soft);
+}
+.letter.gap{border:0;padding:0}
+.letter.gap.space{width:16px}
+.letter.gap.punct{width:14px;color:var(--muted);font-size:1rem}
+.letter.revealed{border-bottom-color:var(--jade);color:#eaf4ff}
+
+.wrongrow{
+  display:flex;gap:5px;justify-content:center;flex-wrap:wrap;
+  min-height:22px;margin-bottom:18px;
+  font-family:var(--serif);color:var(--red);
+  font-size:.95rem;letter-spacing:.14em;
+}
+.wrongrow .lbl{font-family:var(--sans);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);align-self:center;margin-right:4px}
+
+.keyboard{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:520px;margin:0 auto}
+.key{
+  width:42px;height:42px;border-radius:7px;
+  border:1px solid var(--line);background:var(--panel);color:var(--text);
+  font-size:.9rem;cursor:pointer;transition:.14s ease;
+}
+.key:hover:not(:disabled){
+  border-color:var(--blue-dim);
+  background:var(--blue-bg);
+  color:var(--blue-soft);
+}
+.key:disabled{cursor:default}
+.key.hit{background:var(--jade-bg);border-color:var(--jade);color:var(--jade)}
+.key.miss{opacity:.2;text-decoration:line-through}
+
+/* Quiz */
+.options{display:grid;gap:9px;max-width:520px;margin:0 auto}
+.option{
+  padding:13px 16px;border-radius:10px;
+  border:1px solid var(--line);background:var(--panel);color:var(--text);
+  font-family:var(--serif);font-size:.98rem;text-align:left;
+  cursor:pointer;transition:.14s ease;
+}
+.option:hover:not(:disabled){
+  border-color:var(--blue-dim);
+  background:var(--blue-bg);
+  color:#eaf4ff;
+}
+.option:disabled{cursor:default}
+.option.gone{opacity:.18;text-decoration:line-through}
+
+.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+
+/* ---------- CROSSWORD / WORD SEARCH ---------- */
+.cw-words{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px 12px;
+  justify-content:center;
+  margin-bottom:14px;
+  padding:10px 12px;
+  background:var(--panel);
+  border-radius:10px;
+  border:1px solid var(--line);
+  font-size:.82rem;
+}
+
+.cw-word{
+  color:var(--muted);
+  font-family:var(--serif);
+  letter-spacing:.03em;
+  transition:color .2s ease, opacity .2s ease;
+}
+
+.cw-word.found{
+  color:var(--jade);
+  text-decoration:line-through;
+  opacity:.55;
+}
+
+.cw-grid{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:2px;
+  max-width:420px;
+  margin:0 auto 16px;
+  aspect-ratio:1;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
+.cw-cell{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:3px;
+  display:grid;
+  place-items:center;
+  font-family:var(--serif);
+  font-size:clamp(.6rem,2.4vw,.9rem);
+  color:var(--text);
+  cursor:pointer;
+  transition:background .1s ease, border-color .1s ease, box-shadow .1s ease;
+}
+
+.cw-cell.found{
+  background:var(--jade-bg);
+  border-color:var(--jade);
+  color:var(--jade);
+}
+
+.cw-cell.dragging{
+  background:var(--blue-bg-hi);
+  border-color:var(--blue);
+  color:var(--blue-bright);
+  box-shadow:0 0 8px rgba(77,171,247,.5);
+}
+
+.cw-cell.hint-glow{
+  animation:cwPulse .55s ease-in-out infinite alternate;
+}
+
+@keyframes cwPulse{
+  from{background:var(--panel);border-color:var(--line)}
+  to{background:rgba(245,199,106,.4);border-color:var(--gold)}
+}
+
+.cw-cell.code{
+  background:linear-gradient(180deg, rgba(245,199,106,.35), rgba(245,199,106,.15));
+  border-color:var(--gold);
+  color:var(--gold-soft);
+  animation:cwGold 1s ease-in-out infinite alternate;
+}
+
+@keyframes cwGold{
+  from{box-shadow:0 0 2px rgba(245,199,106,.4)}
+  to{box-shadow:0 0 10px rgba(245,199,106,.8)}
+}
+
+.cw-code-prompt{
+  max-width:380px;
+  margin:16px auto;
+  padding:16px;
+  background:linear-gradient(180deg, rgba(245,199,106,.12), rgba(245,199,106,.03));
+  border:1px solid var(--gold-dim);
+  border-radius:12px;
+  text-align:center;
+}
+
+.cw-code-prompt p{
+  margin:0 0 12px;
+  font-family:var(--serif);
+  color:var(--gold-soft);
+  font-size:.95rem;
+  letter-spacing:.05em;
+}
+
+.cw-code-input{
+  width:180px;
+  padding:10px 14px;
+  font-family:var(--serif);
+  font-size:1.4rem;
+  letter-spacing:.3em;
+  text-align:center;
+  text-transform:uppercase;
+  background:var(--bg);
+  color:var(--gold);
+  border:1px solid var(--gold-dim);
+  border-radius:8px;
+  margin:0 8px 0 0;
+  outline:none;
+}
+
+.cw-code-input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px rgba(245,199,106,.2);
+}
+
+.cw-code-prompt.shake{animation:cwShake .35s}
+@keyframes cwShake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  75%{transform:translateX(5px)}
+}
+
+/* Over */
+.overlabel{
+  text-align:center;font-size:.64rem;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--muted);font-weight:700;margin:4px 0 6px;
+}
+.overscore{
+  font-family:var(--serif);font-size:clamp(3rem,12vw,5rem);line-height:1;
+  text-align:center;margin:6px 0 4px;
+  background:linear-gradient(180deg,#f0f8ff 0%, #b5d9ff 40%, #4dabf7 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:.02em;
+}
+.overstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0}
+.overstat{
+  background:var(--panel);border:1px solid var(--line);border-radius:11px;
+  padding:13px;text-align:center;
+}
+.overstat .k{
+  font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;display:block;margin-bottom:5px;
+}
+.overstat .v{
+  font-family:var(--serif);font-size:1.3rem;
+  color:var(--gold);font-weight:600;
+}
+
+.footnote{
+  margin-top:28px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:.76rem;color:var(--muted);text-align:center;
+}
+.kbd-hint{font-size:.7rem;color:var(--muted);text-align:center;margin-top:16px}
+
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:24px;
+  transform:translateX(-50%) translateY(14px);
+  background:var(--panel-hi);
+  border:1px solid var(--blue-dim);
+  color:var(--blue-soft);
+  padding:10px 20px;border-radius:999px;
+  font-size:.84rem;font-weight:500;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease;
+  z-index:200;max-width:90vw;text-align:center;
+  box-shadow:0 16px 40px rgba(0,0,0,.55);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.good{border-color:var(--jade);color:#c7f7e9;background:#15302b}
+.toast.bad{border-color:var(--red);color:#ffc9c3;background:#2d1a19}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:560px){
+  .topbar{padding:8px 12px;gap:8px}
+  .brand{font-size:.82rem}
+  .brand span{font-size:.48rem;letter-spacing:.22em}
+  .stats{gap:10px}
+  .stat .k{font-size:.48rem}
+  .stat .v{font-size:.9rem}
+  .stat .v.hearts{font-size:.82rem}
+  main{padding:18px 12px 60px}
+  .mode-header{padding:12px 13px;gap:10px}
+  .mode-icon{width:34px;height:34px;font-size:.95rem}
+  .mode-title-wrap h3{font-size:.96rem}
+  .mode-tagline{font-size:.76rem}
+  .mode-body-inner{padding:0 13px}
+  .mode-item.open .mode-body-inner{padding:0 13px 14px}
+  .hintbox{padding:11px 13px;font-size:.92rem;margin-bottom:18px}
+  .slots{gap:4px;min-height:38px}
+  .slot{width:26px;height:36px;font-size:.95rem}
+  .tiles{gap:5px}
+  .tile{width:36px;height:36px;font-size:.94rem}
+  .word{gap:4px;min-height:40px}
+  .letter{width:22px;height:38px;font-size:1.02rem}
+  .letter.gap.space{width:14px}
+  .letter.gap.punct{width:10px;font-size:.95rem}
+  .key{width:38px;height:38px;font-size:.85rem}
+  .option{padding:11px 13px;font-size:.92rem}
+  .actions{gap:6px;margin-top:20px}
+  .btn{padding:10px 15px;font-size:.82rem}
+  .overstats{grid-template-columns:1fr;gap:8px}
+  .overstat{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;text-align:left}
+  .overstat .k{margin:0}
+  .overstat .v{font-size:1.1rem}
+  .cw-grid{gap:1px}
+  .cw-words{font-size:.74rem;gap:3px 8px;padding:8px 10px}
+  .cw-code-input{width:140px;font-size:1.2rem}
+}
+@media (max-width:420px){
+  .topbar #btnShare{display:none}
+  .brand{font-size:.78rem}
+}
+@media (max-width:360px){
+  .key{width:34px;height:34px;font-size:.78rem}
+  .tile{width:32px;height:32px;font-size:.86rem}
+  .slot{width:23px;height:32px;font-size:.88rem}
+  .letter{width:20px;height:34px;font-size:.95rem}
+  .letter.gap.space{width:12px}
+  .letter.gap.punct{width:9px;font-size:.9rem}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">MOBA Expert<span>Word Trial</span></div>
+  <div class="stats">
+    <div class="stat"><span class="k">Score</span><span class="v" id="hudScore">0</span></div>
+    <div class="stat"><span class="k">Lives</span><span class="v hearts" id="hudLives">♥♥♥♥♥</span></div>
+    <div class="stat"><span class="k">Streak</span><span class="v" id="hudStreak">0</span></div>
+    <div class="stat"><span class="k">Best</span><span class="v" id="hudBest">0</span></div>
+  </div>
+  <button class="btn small" id="btnShare">Share</button>
+</header>
+
+<main>
+
+  <!-- ===== START = MODE SELECTION ===== -->
+  <section class="screen on" id="screenStart">
+    <h1 class="start-title">Choose a mode</h1>
+    <p class="start-sub">Guess the term from its definition. Each mode plays differently.</p>
+
+    <div id="modeAccordion"></div>
+
+    <p class="kbd-hint">Progress is saved automatically — close the tab and continue later.</p>
+
+    <div class="footnote">
+      Definitions drawn from <em>The Art of MOBA — Being part of a community team</em>.
+    </div>
+  </section>
+
+  <!-- ===== GAME ===== -->
+  <section class="screen" id="screenGame">
+    <div class="stagehead">
+      <div class="modename" id="modeName">—</div>
+      <div class="roundinfo" id="roundInfo">Round 1</div>
+    </div>
+    <div class="hintbox" id="hintBox">—</div>
+    <div id="playArea"></div>
+    <div class="actions">
+      <button class="btn" id="btnHint">Hint (−30)</button>
+      <button class="btn danger" id="btnGiveUp">Give up</button>
+      <button class="btn" id="btnQuit">Quit</button>
+    </div>
+  </section>
+
+  <!-- ===== OVER ===== -->
+  <section class="screen" id="screenOver">
+    <p class="overlabel" id="overMode">Run complete</p>
+    <div class="overscore" id="overScore">0</div>
+    <div class="overstats">
+      <div class="overstat"><span class="k">Solved</span><span class="v" id="overCorrect">0</span></div>
+      <div class="overstat"><span class="k">Best streak</span><span class="v" id="overStreak">0</span></div>
+      <div class="overstat"><span class="k">Personal best</span><span class="v" id="overBest">0</span></div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="btnAgain">Play again</button>
+      <button class="btn" id="btnShareOver">Share</button>
+      <button class="btn" id="btnMenu">Menu</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const KEY = 'moba_expert_wordtrial_v1';
+const MAX_LIVES = 5;
+const START_HINTS = 2;
+const HINT_COST = 30;
+const CROSSWORD_HINT_COST = 100;
+const CROSSWORD_WRONG_CODE_COST = 50;
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+function norm(s){ return s.toUpperCase().replace(/[^A-Z]/g, ''); }
+function shuffle(a){
+  const r = a.slice();
+  for(let i = r.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+}
+function rngInt(min, max){ return min + Math.floor(Math.random() * (max - min + 1)); }
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const defaultState = () => ({
+  v: 1,
+  mode: null,
+  score: 0,
+  lives: MAX_LIVES,
+  streak: 0,
+  bestStreak: 0,
+  rounds: 0,
+  correct: 0,
+  pool: [],
+  cur: null,
+  rs: null,
+  roundPenalty: 0,
+  hintsLeft: START_HINTS,
+  best: { scramble: 0, letters: 0, quiz: 0, crossword: 0 },
+  lastRun: null,
+  savedAt: Date.now()
+});
+
+let state = defaultState();
+let locked = false;
+let toastTimer = null;
+
+/* Crossword drag state (in-memory, not persisted) */
+let cwDragging = false;
+let cwDragPath = [];
+
+/* ============================================================
+   PERSISTENCE
+   ============================================================ */
+function save(){
+  try{
+    state.savedAt = Date.now();
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }catch(e){ /* storage unavailable */ }
+}
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return null;
+    const s = JSON.parse(raw);
+    if(!s || s.v !== 1) return null;
+    return s;
+  }catch(e){ return null; }
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function toast(msg, kind){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (kind ? ' ' + kind : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.className = 'toast' + (kind ? ' ' + kind : '');
+  }, 2100);
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+function showScreen(name){
+  ['start', 'game', 'over'].forEach(k => {
+    const el = document.getElementById('screen' + k.charAt(0).toUpperCase() + k.slice(1));
+    if(el) el.classList.toggle('on', k === name);
+  });
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function renderHUD(){
+  $('#hudScore').textContent = state.score;
+  $('#hudStreak').textContent = state.streak;
+  const filled = '♥'.repeat(Math.max(0, state.lives));
+  const empty = '♡'.repeat(Math.max(0, MAX_LIVES - state.lives));
+  $('#hudLives').textContent = state.mode === 'crossword' ? '—' : (filled + empty);
+  const b = state.mode ? (state.best[state.mode] || 0) : 0;
+  $('#hudBest').textContent = b;
+}
+
+/* ============================================================
+   ACCORDION — MODE SELECTOR
+   ============================================================ */
+function renderAccordion(){
+  const container = $('#modeAccordion');
+  container.innerHTML = '';
+
+  Object.keys(MODES).forEach(modeId => {
+    const mode = MODES[modeId];
+    const item = document.createElement('div');
+    item.className = 'mode-item';
+    item.dataset.mode = modeId;
+
+    const header = document.createElement('button');
+    header.type = 'button';
+    header.className = 'mode-header';
+    header.setAttribute('aria-expanded', 'false');
+    header.innerHTML =
+      '<span class="mode-icon">' + mode.icon + '</span>' +
+      '<div class="mode-title-wrap">' +
+        '<h3>' + mode.label + '</h3>' +
+        '<p class="mode-tagline">' + mode.tagline + '</p>' +
+      '</div>' +
+      '<span class="mode-chevron">▾</span>';
+
+    header.addEventListener('click', () => toggleMode(modeId));
+
+    const body = document.createElement('div');
+    body.className = 'mode-body';
+
+    const inner = document.createElement('div');
+    inner.className = 'mode-body-inner';
+
+    const rules = document.createElement('ul');
+    rules.className = 'mode-rules';
+    mode.rules.forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = r;
+      rules.appendChild(li);
+    });
+
+    const best = document.createElement('p');
+    best.className = 'mode-best';
+    best.innerHTML = 'Personal best · <b>' + (state.best[modeId] || 0) + '</b>';
+
+    const startBtn = document.createElement('button');
+    startBtn.type = 'button';
+    startBtn.className = 'btn primary';
+    startBtn.textContent = 'Start ' + mode.label;
+    startBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      startGame(modeId);
+    });
+
+    inner.appendChild(rules);
+    inner.appendChild(best);
+    inner.appendChild(startBtn);
+    body.appendChild(inner);
+
+    item.appendChild(header);
+    item.appendChild(body);
+    container.appendChild(item);
+  });
+}
+
+function toggleMode(modeId){
+  document.querySelectorAll('.mode-item').forEach(item => {
+    const isTarget = item.dataset.mode === modeId;
+    const willOpen = isTarget && !item.classList.contains('open');
+    item.classList.toggle('open', willOpen);
+    const header = item.querySelector('.mode-header');
+    if(header) header.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  });
+}
+
+/* ============================================================
+   ROUND BUILDING (non-crossword)
+   ============================================================ */
+function newRound(){
+  locked = false;
+
+  if(!Array.isArray(state.pool) || state.pool.length === 0){
+    state.pool = shuffle(WORDS.map((_, i) => i));
+  }
+
+  let idx = state.pool.pop();
+  if(idx == null || !WORDS[idx]){
+    state.pool = shuffle(WORDS.map((_, i) => i));
+    idx = state.pool.pop();
+  }
+
+  state.cur = { w: WORDS[idx].w, d: WORDS[idx].d };
+  state.rounds += 1;
+  state.roundPenalty = 0;
+  state.hintsLeft = START_HINTS;
+  buildRoundState();
+
+  save();
+  renderHUD();
+  renderGame();
+}
+
+function buildRoundState(){
+  const word = state.cur.w;
+
+  if(state.mode === 'scramble'){
+    const letters = norm(word).split('');
+    let tiles, guard = 0;
+    do {
+      tiles = shuffle(letters);
+      guard++;
+    } while(letters.length > 2 && tiles.join('') === letters.join('') && guard < 20);
+    state.rs = { tiles, placed: [] };
+  } else if(state.mode === 'letters'){
+    state.rs = { guessed: [], wrong: [] };
+  } else {
+    const others = shuffle(
+      WORDS.filter(p => norm(p.w) !== norm(word)).map(p => p.w)
+    ).slice(0, 3);
+    state.rs = {
+      options: shuffle([word, ...others]),
+      eliminated: []
+    };
+  }
+}
+
+/* ============================================================
+   ROUND RESOLUTION (non-crossword)
+   ============================================================ */
+function solveRound(){
+  if(locked) return;
+  locked = true;
+
+  const base = (MODES[state.mode] && MODES[state.mode].base) || 100;
+  const raw = Math.max(20, base - state.roundPenalty);
+  const streakBonus = Math.min(state.streak * 10, 100);
+  const pts = raw + streakBonus;
+
+  state.score += pts;
+  state.streak += 1;
+  state.bestStreak = Math.max(state.bestStreak, state.streak);
+  state.correct += 1;
+
+  save();
+  toast('+' + pts + ' · ' + state.cur.w, 'good');
+
+  setTimeout(() => { if(state.mode) newRound(); }, 620);
+}
+
+function failRound(){
+  if(locked) return;
+  locked = true;
+
+  const answer = state.cur.w;
+  state.lives -= 1;
+  state.streak = 0;
+
+  if(state.lives <= 0){
+    state.lives = 0;
+    toast('The answer was ' + answer, 'bad');
+    setTimeout(endGame, 500);
+    return;
+  }
+
+  save();
+  toast('The answer was ' + answer, 'bad');
+  setTimeout(() => { if(state.mode) newRound(); }, 1100);
+}
+
+/* ============================================================
+   END GAME
+   ============================================================ */
+function endGame(){
+  const mode = state.mode;
+  if(!mode) return;
+
+  if(state.score > (state.best[mode] || 0)) state.best[mode] = state.score;
+
+  state.lastRun = {
+    mode: mode,
+    score: state.score,
+    correct: state.correct,
+    bestStreak: state.bestStreak
+  };
+  if (mode === 'crossword' && state.rs){
+    state.lastRun.code = state.rs.code;
+    state.lastRun.gaveUp = !!state.rs.gaveUp;
+  }
+
+  state.mode = null;
+  state.cur = null;
+  state.rs = null;
+  state.pool = [];
+  state.score = 0;
+  state.lives = MAX_LIVES;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.rounds = 0;
+  state.correct = 0;
+  state.roundPenalty = 0;
+  state.hintsLeft = START_HINTS;
+
+  save();
+  renderHUD();
+  renderOver();
+  showScreen('over');
+}
+
+/* ============================================================
+   GAME FLOW
+   ============================================================ */
+function startGame(mode){
+  if (mode === 'crossword'){
+    startCrossword();
+    return;
+  }
+
+  state.mode = mode;
+  state.score = 0;
+  state.lives = MAX_LIVES;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.rounds = 0;
+  state.correct = 0;
+  state.pool = [];
+  state.cur = null;
+  state.rs = null;
+  state.roundPenalty = 0;
+  state.hintsLeft = START_HINTS;
+  locked = false;
+  showScreen('game');
+  newRound();
+}
+
+function quitToMenu(){
+  state.mode = null;
+  state.cur = null;
+  state.rs = null;
+  state.pool = [];
+  state.score = 0;
+  state.lives = MAX_LIVES;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.rounds = 0;
+  state.correct = 0;
+  state.roundPenalty = 0;
+  state.hintsLeft = START_HINTS;
+  locked = false;
+  cwDragging = false;
+  cwDragPath = [];
+  save();
+  renderHUD();
+  renderAccordion();
+  showScreen('start');
+}
+
+/* ============================================================
+   RENDER GAME
+   ============================================================ */
+function renderGame(){
+  if(!state.mode || !state.rs) return;
+
+  renderHUD();
+  $('#modeName').textContent = MODES[state.mode].label;
+
+  if (state.mode === 'crossword'){
+    renderCrosswordScreen();
+    return;
+  }
+
+  if(!state.cur) return;
+
+  $('#roundInfo').textContent = 'Round ' + state.rounds + ' · ' + state.correct + ' solved';
+  $('#hintBox').textContent = state.cur.d;
+  $('#btnHint').textContent = state.hintsLeft > 0
+    ? 'Hint (−' + HINT_COST + ') · ' + state.hintsLeft + ' left'
+    : 'No hints left';
+  $('#btnHint').disabled = locked || state.hintsLeft <= 0;
+  $('#btnGiveUp').disabled = locked;
+
+  const area = $('#playArea');
+  area.innerHTML = '';
+
+  if(state.mode === 'scramble') renderScramble(area);
+  else if(state.mode === 'letters') renderLetters(area);
+  else renderQuiz(area);
+}
+
+/* ---------- SCRAMBLE ---------- */
+function renderScramble(area){
+  const rs = state.rs;
+  const full = norm(state.cur.w);
+
+  const slots = document.createElement('div');
+  slots.className = 'slots';
+  for(let i = 0; i < full.length; i++){
+    const slot = document.createElement('div');
+    const has = rs.placed[i] !== undefined;
+    slot.className = 'slot' + (has ? ' filled' : '') + (i === rs.placed.length ? ' next' : '');
+    slot.textContent = has ? rs.tiles[rs.placed[i]] : '';
+    slots.appendChild(slot);
+  }
+  area.appendChild(slots);
+
+  const tiles = document.createElement('div');
+  tiles.className = 'tiles';
+  rs.tiles.forEach((ch, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tile';
+    b.textContent = ch;
+    b.disabled = locked || rs.placed.includes(i);
+    b.addEventListener('click', () => placeTile(i));
+    tiles.appendChild(b);
+  });
+  area.appendChild(tiles);
+
+  const ctrls = document.createElement('div');
+  ctrls.className = 'slotctl';
+
+  const back = document.createElement('button');
+  back.type = 'button';
+  back.className = 'btn small';
+  back.textContent = '⌫ Back';
+  back.disabled = locked || rs.placed.length === 0;
+  back.addEventListener('click', () => {
+    state.rs.placed.pop();
+    save();
+    renderGame();
+  });
+
+  const clear = document.createElement('button');
+  clear.type = 'button';
+  clear.className = 'btn small';
+  clear.textContent = 'Clear';
+  clear.disabled = locked || rs.placed.length === 0;
+  clear.addEventListener('click', () => {
+    state.rs.placed = [];
+    save();
+    renderGame();
+  });
+
+  ctrls.append(back, clear);
+  area.appendChild(ctrls);
+}
+
+function placeTile(i){
+  if(locked) return;
+  const rs = state.rs;
+  if(rs.placed.includes(i)) return;
+
+  rs.placed.push(i);
+  const full = norm(state.cur.w);
+
+  if(rs.placed.length === full.length){
+    const guess = rs.placed.map(k => rs.tiles[k]).join('');
+    if(guess === full){
+      solveRound();
+    } else {
+      rs.placed = [];
+      state.roundPenalty += 15;
+      state.streak = 0;
+      state.lives -= 1;
+      if(state.lives <= 0){
+        state.lives = 0;
+        save();
+        renderGame();
+        toast('The answer was ' + state.cur.w, 'bad');
+        setTimeout(endGame, 500);
+        return;
+      }
+      save();
+      renderGame();
+      toast('Not quite — one life lost', 'bad');
+    }
+    return;
+  }
+
+  save();
+  renderGame();
+}
+
+/* ---------- LETTERS ---------- */
+function renderLetters(area){
+  const rs = state.rs;
+  const word = state.cur.w.toUpperCase();
+  const guessed = new Set(rs.guessed);
+  const wrong = new Set(rs.wrong);
+
+  const wordEl = document.createElement('div');
+  wordEl.className = 'word';
+  for(const ch of word){
+    const el = document.createElement('div');
+    if(!/[A-Z]/.test(ch)){
+      if(ch.trim() === ''){
+        el.className = 'letter gap space';
+      } else {
+        el.className = 'letter gap punct';
+        el.textContent = ch;
+      }
+    } else if(guessed.has(ch)){
+      el.className = 'letter revealed';
+      el.textContent = ch;
+    } else {
+      el.className = 'letter';
+      el.textContent = '';
+    }
+    wordEl.appendChild(el);
+  }
+  area.appendChild(wordEl);
+
+  const wrongRow = document.createElement('div');
+  wrongRow.className = 'wrongrow';
+  if(rs.wrong.length){
+    const lbl = document.createElement('span');
+    lbl.className = 'lbl';
+    lbl.textContent = 'Misses';
+    wrongRow.appendChild(lbl);
+    rs.wrong.forEach(ch => {
+      const s = document.createElement('span');
+      s.textContent = ch;
+      wrongRow.appendChild(s);
+    });
+  }
+  area.appendChild(wrongRow);
+
+  const kb = document.createElement('div');
+  kb.className = 'keyboard';
+  LETTERS.forEach(ch => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'key';
+    b.textContent = ch;
+    const hit = guessed.has(ch);
+    const miss = wrong.has(ch);
+    if(hit) b.classList.add('hit');
+    if(miss) b.classList.add('miss');
+    b.disabled = locked || hit || miss;
+    b.addEventListener('click', () => guessLetter(ch));
+    kb.appendChild(b);
+  });
+  area.appendChild(kb);
+}
+
+function guessLetter(ch){
+  if(locked) return;
+  const rs = state.rs;
+  if(rs.guessed.includes(ch) || rs.wrong.includes(ch)) return;
+
+  const full = norm(state.cur.w);
+
+  if(full.includes(ch)){
+    rs.guessed.push(ch);
+    const distinct = new Set(full.split(''));
+    if([...distinct].every(c => rs.guessed.includes(c))){
+      solveRound();
+      return;
+    }
+  } else {
+    rs.wrong.push(ch);
+    state.roundPenalty += 8;
+    if(rs.wrong.length >= 6){ failRound(); return; }
+  }
+
+  save();
+  renderGame();
+}
+
+/* ---------- QUIZ ---------- */
+function renderQuiz(area){
+  const rs = state.rs;
+  const wrap = document.createElement('div');
+  wrap.className = 'options';
+
+  rs.options.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'option';
+    b.textContent = opt;
+    if(rs.eliminated.includes(i)) b.classList.add('gone');
+    b.disabled = locked || rs.eliminated.includes(i);
+    b.addEventListener('click', () => answerQuiz(i));
+    wrap.appendChild(b);
+  });
+
+  area.appendChild(wrap);
+}
+
+function answerQuiz(i){
+  if(locked) return;
+  const chosen = state.rs.options[i];
+  const correct = state.cur.w;
+
+  if(norm(chosen) === norm(correct)){
+    solveRound();
+  } else {
+    failRound();
+  }
+}
+
+/* ============================================================
+   HINTS (non-crossword)
+   ============================================================ */
+function useHint(){
+  if(locked || !state.rs || state.hintsLeft <= 0) return;
+
+  state.hintsLeft -= 1;
+  state.roundPenalty += HINT_COST;
+  const rs = state.rs;
+
+  if(state.mode === 'scramble'){
+    const full = norm(state.cur.w);
+    const k = rs.placed.length;
+    if(k >= full.length) return;
+
+    const need = full[k];
+    const used = new Set(rs.placed);
+    const idx = rs.tiles.findIndex((ch, i) => ch === need && !used.has(i));
+    if(idx < 0) return;
+
+    rs.placed.push(idx);
+    save();
+
+    if(rs.placed.length === full.length){
+      const guess = rs.placed.map(j => rs.tiles[j]).join('');
+      if(guess === full){ solveRound(); return; }
+      rs.placed = [];
+      state.roundPenalty += 15;
+      state.lives -= 1;
+      state.streak = 0;
+      if(state.lives <= 0){
+        state.lives = 0;
+        save(); renderGame();
+        toast('The answer was ' + state.cur.w, 'bad');
+        setTimeout(endGame, 500);
+        return;
+      }
+      save(); renderGame();
+      toast('Not quite — one life lost', 'bad');
+      return;
+    }
+    renderGame();
+    return;
+  }
+
+  if(state.mode === 'letters'){
+    const full = norm(state.cur.w);
+    const distinct = [...new Set(full.split(''))];
+    const remaining = distinct.filter(c => !rs.guessed.includes(c));
+    if(!remaining.length) return;
+
+    const pick = remaining[Math.floor(Math.random() * remaining.length)];
+    rs.guessed.push(pick);
+    save();
+
+    if(distinct.every(c => rs.guessed.includes(c))){ solveRound(); return; }
+    renderGame();
+    return;
+  }
+
+  const correct = norm(state.cur.w);
+  const wrongIdx = rs.options
+    .map((o, i) => ({ o, i }))
+    .filter(x => norm(x.o) !== correct && !rs.eliminated.includes(x.i))
+    .map(x => x.i);
+
+  if(wrongIdx.length <= 1) return;
+
+  const kills = shuffle(wrongIdx).slice(0, 2);
+  rs.eliminated.push(...kills);
+  save();
+  renderGame();
+}
+
+/* ============================================================
+   CROSSWORD / WORD SEARCH
+   ============================================================ */
+function buildSpiral(rows, cols){
+  const result = [];
+  let top = 0, bottom = rows - 1, left = 0, right = cols - 1;
+  while (top <= bottom && left <= right){
+    for (let c = left; c <= right; c++) result.push({r: top, c});
+    top++;
+    for (let r = top; r <= bottom; r++) result.push({r: r, c: right});
+    right--;
+    if (top <= bottom){
+      for (let c = right; c >= left; c--) result.push({r: bottom, c});
+      bottom--;
+    }
+    if (left <= right){
+      for (let r = bottom; r >= top; r--) result.push({r: r, c: left});
+      left++;
+    }
+  }
+  return result;
+}
+
+function buildCrosswordPuzzle(){
+  for (let attempt = 0; attempt < 100; attempt++){
+    const K = rngInt(3, 7);
+    const targetSum = 100 - K;
+
+    const words = [];
+    const used = new Set();
+    let total = 0;
+    let pickTries = 0;
+
+    while (total < targetSum && pickTries < 3000){
+      pickTries++;
+      const remaining = targetSum - total;
+
+      const candidates = WORDS.filter(w => {
+        const len = norm(w.w).length;
+        if (len > remaining) return false;
+        if (used.has(norm(w.w))) return false;
+        return true;
+      });
+
+      if (candidates.length === 0) break;
+
+      let weighted = candidates.filter(w => norm(w.w).length >= 4);
+      if (weighted.length === 0) weighted = candidates;
+
+      const pick = weighted[Math.floor(Math.random() * weighted.length)];
+      words.push(pick);
+      used.add(norm(pick.w));
+      total += norm(pick.w).length;
+    }
+
+    if (total !== targetSum) continue;
+    if (words.length < 6 || words.length > 20) continue;
+
+    const spiral = buildSpiral(10, 10);
+    if (spiral.length !== 100) continue;
+
+    const grid = new Array(100).fill('?');
+    const placedWords = [];
+    let idx = 0;
+
+    for (const word of words){
+      const letters = norm(word.w).split('');
+      const path = [];
+      for (const letter of letters){
+        const cell = spiral[idx];
+        grid[cell.r * 10 + cell.c] = letter;
+        path.push(cell);
+        idx++;
+      }
+      placedWords.push({ word: word.w, letters: letters.join(''), path: path });
+    }
+
+    let code = '';
+    while (idx < 100){
+      const cell = spiral[idx];
+      const letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+      grid[cell.r * 10 + cell.c] = letter;
+      code += letter;
+      idx++;
+    }
+
+    return { grid: grid, placedWords: placedWords, code: code, K: K };
+  }
+  return null;
+}
+
+function startCrossword(){
+  let puzzle = null;
+  for (let attempt = 0; attempt < 6 && !puzzle; attempt++){
+    puzzle = buildCrosswordPuzzle();
+  }
+  if (!puzzle){
+    toast('Could not generate a puzzle — try again', 'bad');
+    return;
+  }
+
+  state.mode = 'crossword';
+  state.score = 0;
+  state.lives = MAX_LIVES;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.rounds = 1;
+  state.correct = 0;
+  state.roundPenalty = 0;
+  state.hintsLeft = START_HINTS;
+  state.pool = [];
+  state.cur = null;
+  state.rs = {
+    grid: puzzle.grid,
+    placedWords: puzzle.placedWords,
+    code: puzzle.code,
+    K: puzzle.K,
+    found: [],
+    codeInput: '',
+    wrongCodeAttempts: 0,
+    correctCode: false,
+    gaveUp: false
+  };
+  cwDragging = false;
+  cwDragPath = [];
+  locked = false;
+  showScreen('game');
+  renderGame();
+}
+
+function cwCellIsFound(r, c){
+  for (const idx of state.rs.found){
+    const pw = state.rs.placedWords[idx];
+    for (const p of pw.path){
+      if (p.r === r && p.c === c) return true;
+    }
+  }
+  return false;
+}
+
+function cwCellIsCode(r, c){
+  if (!state.rs) return false;
+  const allFound = state.rs.found.length === state.rs.placedWords.length;
+  if (!allFound) return false;
+  // Any cell not in any word is a code cell
+  for (const pw of state.rs.placedWords){
+    for (const p of pw.path){
+      if (p.r === r && p.c === c) return false;
+    }
+  }
+  return true;
+}
+
+function renderCrosswordScreen(){
+  const rs = state.rs;
+  const total = rs.placedWords.length;
+  const found = rs.found.length;
+  const solved = found === total;
+
+  $('#roundInfo').textContent = found + ' / ' + total + ' terms';
+  if (solved && !rs.correctCode){
+    $('#hintBox').textContent = 'All terms found. Read the highlighted cells left to right, top to bottom — then enter the pass code.';
+  } else if (rs.correctCode){
+    $('#hintBox').textContent = 'Puzzle complete. Pass code: ' + rs.code;
+  } else {
+    $('#hintBox').textContent = 'Drag across adjacent cells to spell each listed term. Bends are allowed.';
+  }
+  $('#btnHint').textContent = state.hintsLeft > 0
+    ? 'Hint (−' + CROSSWORD_HINT_COST + ') · ' + state.hintsLeft + ' left'
+    : 'No hints left';
+  $('#btnHint').disabled = locked || state.hintsLeft <= 0 || solved;
+  $('#btnGiveUp').disabled = locked || rs.correctCode;
+
+  const area = $('#playArea');
+  area.innerHTML = '';
+
+  renderCrossword(area);
+}
+
+function renderCrossword(area){
+  const rs = state.rs;
+  const solved = rs.found.length === rs.placedWords.length;
+
+  // Word list
+  const wordList = document.createElement('div');
+  wordList.className = 'cw-words';
+  rs.placedWords.forEach((pw, i) => {
+    const item = document.createElement('span');
+    item.className = 'cw-word' + (rs.found.includes(i) ? ' found' : '');
+    item.textContent = pw.word;
+    wordList.appendChild(item);
+  });
+  area.appendChild(wordList);
+
+  // Grid
+  const grid = document.createElement('div');
+  grid.className = 'cw-grid';
+
+  const dragSet = new Set();
+  cwDragPath.forEach(p => dragSet.add(p.r * 10 + p.c));
+
+  for (let r = 0; r < 10; r++){
+    for (let c = 0; c < 10; c++){
+      const cell = document.createElement('div');
+      cell.className = 'cw-cell';
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+      cell.textContent = rs.grid[r * 10 + c];
+
+      if (cwCellIsFound(r, c)) cell.classList.add('found');
+      if (dragSet.has(r * 10 + c)) cell.classList.add('dragging');
+      if (solved && !rs.correctCode && cwCellIsCode(r, c)) cell.classList.add('code');
+
+      grid.appendChild(cell);
+    }
+  }
+  area.appendChild(grid);
+
+  // Code input
+  if (solved && !rs.correctCode){
+    const prompt = document.createElement('div');
+    prompt.className = 'cw-code-prompt';
+    prompt.innerHTML = '<p>Enter the pass code:</p>';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'cw-code-input';
+    input.maxLength = rs.K;
+    input.value = rs.codeInput || '';
+    input.inputMode = 'text';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.addEventListener('input', function(){
+      this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, rs.K);
+      rs.codeInput = this.value;
+    });
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){
+        e.preventDefault();
+        checkCrosswordCode();
+      }
+    });
+
+    const submit = document.createElement('button');
+    submit.type = 'button';
+    submit.className = 'btn primary';
+    submit.textContent = 'Submit';
+    submit.addEventListener('click', checkCrosswordCode);
+
+    prompt.appendChild(input);
+    prompt.appendChild(submit);
+    area.appendChild(prompt);
+
+    setTimeout(() => {
+      const inp = document.querySelector('.cw-code-input');
+      if (inp && document.activeElement !== inp) inp.focus();
+    }, 60);
+  }
+}
+
+function checkCrosswordCode(){
+  if (!state.rs || state.rs.correctCode) return;
+  const entered = (state.rs.codeInput || '').toUpperCase().replace(/[^A-Z]/g, '');
+  if (entered === state.rs.code){
+    state.rs.correctCode = true;
+    completeCrossword(false);
+  } else {
+    state.rs.wrongCodeAttempts = (state.rs.wrongCodeAttempts || 0) + 1;
+    state.roundPenalty += CROSSWORD_WRONG_CODE_COST;
+    state.rs.codeInput = '';
+    save();
+    toast('Wrong code — try again', 'bad');
+    renderGame();
+    const prompt = document.querySelector('.cw-code-prompt');
+    if (prompt){
+      prompt.classList.add('shake');
+      setTimeout(() => prompt.classList.remove('shake'), 400);
+    }
+  }
+}
+
+function completeCrossword(gaveUp){
+  const raw = gaveUp ? 0 : Math.max(100, (MODES.crossword.base || 1000) - state.roundPenalty);
+  state.score = raw;
+  state.correct = gaveUp ? 0 : 1;
+  state.rs.gaveUp = !!gaveUp;
+  save();
+  toast(
+    gaveUp
+      ? 'Code revealed: ' + state.rs.code
+      : '+' + raw + ' · Code: ' + state.rs.code,
+    gaveUp ? 'bad' : 'good'
+  );
+  setTimeout(endGame, 1200);
+}
+
+function crosswordHint(){
+  if (!state.rs || locked || state.hintsLeft <= 0) return;
+  const unfound = state.rs.placedWords
+    .map((pw, i) => ({ pw: pw, i: i }))
+    .filter(x => !state.rs.found.includes(x.i));
+  if (unfound.length === 0) return;
+
+  state.hintsLeft--;
+  state.roundPenalty += CROSSWORD_HINT_COST;
+  save();
+
+  const pick = unfound[Math.floor(Math.random() * unfound.length)];
+  pick.pw.path.forEach(p => {
+    const el = document.querySelector('.cw-cell[data-r="' + p.r + '"][data-c="' + p.c + '"]');
+    if (el){
+      el.classList.add('hint-glow');
+      setTimeout(() => el.classList.remove('hint-glow'), 2600);
+    }
+  });
+
+  renderCrosswordScreen();
+}
+
+function checkDragWord(){
+  if (cwDragPath.length < 2) return;
+  const rs = state.rs;
+  const letters = cwDragPath.map(p => rs.grid[p.r * 10 + p.c]).join('');
+  const reversed = letters.split('').reverse().join('');
+
+  for (let i = 0; i < rs.placedWords.length; i++){
+    if (rs.found.includes(i)) continue;
+    const pw = rs.placedWords[i];
+    if (pw.letters === letters || pw.letters === reversed){
+      rs.found.push(i);
+      save();
+      if (rs.found.length === rs.placedWords.length){
+        toast('All terms found — enter the pass code', 'good');
+      } else {
+        toast('Found: ' + pw.word, 'good');
+      }
+      renderGame();
+      return;
+    }
+  }
+}
+
+function updateDragHighlight(){
+  const set = new Set();
+  cwDragPath.forEach(p => set.add(p.r * 10 + p.c));
+  document.querySelectorAll('.cw-cell').forEach(el => {
+    const key = (+el.dataset.r) * 10 + (+el.dataset.c);
+    el.classList.toggle('dragging', set.has(key));
+  });
+}
+
+/* ============================================================
+   OVER SCREEN
+   ============================================================ */
+function renderOver(){
+  const r = state.lastRun;
+  if(!r){ showScreen('start'); renderAccordion(); return; }
+
+  $('#overMode').textContent = MODES[r.mode].label + ' · ' + (r.gaveUp ? 'given up' : 'run complete');
+  $('#overScore').textContent = r.score;
+  $('#overCorrect').textContent = r.correct;
+
+  const statLabel2 = $('#overStreak').parentElement.querySelector('.k');
+  if (r.mode === 'crossword' && r.code){
+    statLabel2.textContent = 'Pass code';
+    $('#overStreak').textContent = r.code;
+    $('#overStreak').style.letterSpacing = '.2em';
+    $('#overStreak').style.fontFamily = 'monospace';
+  } else {
+    statLabel2.textContent = 'Best streak';
+    $('#overStreak').textContent = r.bestStreak;
+    $('#overStreak').style.letterSpacing = '';
+    $('#overStreak').style.fontFamily = '';
+  }
+
+  $('#overBest').textContent = state.best[r.mode] || 0;
+}
+
+/* ============================================================
+   SHARE
+   ============================================================ */
+function buildShareText(){
+  if (state.mode === 'crossword' && state.rs){
+    return [
+      'MOBA Expert — Word Trial',
+      'Word Search · in progress',
+      state.rs.found.length + ' / ' + state.rs.placedWords.length + ' terms found'
+    ].join('\n');
+  }
+  if(state.mode && state.cur){
+    return [
+      'MOBA Expert — Word Trial',
+      MODES[state.mode].label + ' · in progress',
+      'Score ' + state.score + ' · ' + state.correct + ' solved · best streak ' + state.bestStreak
+    ].join('\n');
+  }
+  if(state.lastRun){
+    const r = state.lastRun;
+    let text = [
+      'MOBA Expert — Word Trial',
+      MODES[r.mode].label,
+      'Score ' + r.score + ' · ' + r.correct + ' solved · best streak ' + r.bestStreak
+    ].join('\n');
+    if (r.mode === 'crossword' && r.code){
+      text += '\nPass code: ' + r.code;
+    }
+    return text;
+  }
+  const bests = Object.keys(MODES)
+    .map(m => MODES[m].label + ': ' + (state.best[m] || 0))
+    .join(' · ');
+  return 'MOBA Expert — Word Trial\nMy bests — ' + bests;
+}
+
+async function copyText(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    return true;
+  }catch(e){
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    }catch(_){ return false; }
+  }
+}
+
+async function shareScore(){
+  const text = buildShareText();
+  if(navigator.share){
+    try{ await navigator.share({ text }); return; }
+    catch(e){ /* cancelled — fall through to copy */ }
+  }
+  const ok = await copyText(text);
+  toast(ok ? 'Score copied to clipboard' : 'Could not copy — select manually', ok ? 'good' : 'bad');
+}
+
+/* ============================================================
+   WIRING
+   ============================================================ */
+$('#btnHint').addEventListener('click', () => {
+  if (state.mode === 'crossword'){
+    crosswordHint();
+  } else {
+    useHint();
+  }
+});
+
+$('#btnGiveUp').addEventListener('click', () => {
+  if (state.mode === 'crossword'){
+    if (!state.rs || state.rs.correctCode) return;
+    if (confirm('Give up? The pass code will be revealed.')){
+      state.rs.correctCode = true;
+      completeCrossword(true);
+    }
+    return;
+  }
+  if(locked || !state.mode) return;
+  failRound();
+});
+
+$('#btnQuit').addEventListener('click', () => {
+  if(confirm('Quit this run? Your progress will be lost.')) quitToMenu();
+});
+
+$('#btnShare').addEventListener('click', shareScore);
+$('#btnShareOver').addEventListener('click', shareScore);
+
+$('#btnAgain').addEventListener('click', () => {
+  const mode = state.lastRun ? state.lastRun.mode : 'scramble';
+  startGame(mode);
+});
+
+$('#btnMenu').addEventListener('click', () => {
+  renderAccordion();
+  showScreen('start');
+});
+
+/* Physical keyboard */
+document.addEventListener('keydown', e => {
+  if(!state.mode || locked) return;
+
+  if(state.mode === 'letters'){
+    const ch = e.key.toUpperCase();
+    if(ch.length === 1 && ch >= 'A' && ch <= 'Z'){
+      e.preventDefault();
+      guessLetter(ch);
+    }
+    return;
+  }
+
+  if(state.mode === 'scramble'){
+    if(e.key === 'Backspace'){
+      e.preventDefault();
+      if(state.rs.placed.length){
+        state.rs.placed.pop();
+        save();
+        renderGame();
+      }
+      return;
+    }
+    const ch = e.key.toUpperCase();
+    if(ch.length === 1 && ch >= 'A' && ch <= 'Z'){
+      e.preventDefault();
+      const used = new Set(state.rs.placed);
+      const idx = state.rs.tiles.findIndex((c, i) => c === ch && !used.has(i));
+      if(idx >= 0) placeTile(idx);
+    }
+    return;
+  }
+
+  if(state.mode === 'quiz'){
+    const n = parseInt(e.key, 10);
+    if(n >= 1 && n <= 4){
+      const btn = $('#playArea').querySelectorAll('.option')[n - 1];
+      if(btn && !btn.disabled) btn.click();
+    }
+  }
+});
+
+/* ============================================================
+   CROSSWORD DRAG (global pointer handlers)
+   ============================================================ */
+document.addEventListener('pointerdown', e => {
+  if (state.mode !== 'crossword' || !state.rs) return;
+  if (state.rs.correctCode) return;
+  if (state.rs.found.length === state.rs.placedWords.length) return;
+  const target = e.target;
+  if (!target || !target.closest) return;
+  const cell = target.closest('.cw-cell');
+  if (!cell) return;
+  e.preventDefault();
+  const r = +cell.dataset.r, c = +cell.dataset.c;
+  if (cwCellIsFound(r, c)) return;
+  cwDragging = true;
+  cwDragPath = [{ r: r, c: c }];
+  updateDragHighlight();
+});
+
+document.addEventListener('pointermove', e => {
+  if (!cwDragging || state.mode !== 'crossword') return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  if (!el || !el.classList || !el.classList.contains('cw-cell')) return;
+  const r = +el.dataset.r, c = +el.dataset.c;
+  const last = cwDragPath[cwDragPath.length - 1];
+  if (!last) return;
+  if (last.r === r && last.c === c) return;
+  if (cwDragPath.some(p => p.r === r && p.c === c)) return;
+  if (Math.abs(last.r - r) + Math.abs(last.c - c) !== 1) return;
+  if (cwCellIsFound(r, c)) return;
+  cwDragPath.push({ r: r, c: c });
+  updateDragHighlight();
+});
+
+document.addEventListener('pointerup', () => {
+  if (!cwDragging) return;
+  cwDragging = false;
+  checkDragWord();
+  cwDragPath = [];
+  updateDragHighlight();
+});
+
+document.addEventListener('pointercancel', () => {
+  if (!cwDragging) return;
+  cwDragging = false;
+  cwDragPath = [];
+  updateDragHighlight();
+});
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+(function boot(){
+  if(typeof WORDS === 'undefined' || typeof MODES === 'undefined'){
+    document.body.innerHTML =
+      '<div style="padding:40px;font-family:sans-serif;color:#e4edf9;background:#0a1524;min-height:100vh;">' +
+      '<h1>data.js did not load</h1>' +
+      '<p>Make sure <code>data.js</code> is in the same folder as <code>index.html</code>.</p>' +
+      '</div>';
+    return;
+  }
+
+  const saved = load();
+  if(saved){
+    state = Object.assign(defaultState(), saved);
+    state.best = Object.assign(
+      { scramble: 0, letters: 0, quiz: 0, crossword: 0 },
+      saved.best || {}
+    );
+    if(Array.isArray(state.pool)){
+      state.pool = state.pool.filter(i => Number.isInteger(i) && WORDS[i]);
+    } else {
+      state.pool = [];
+    }
+  }
+
+  renderAccordion();
+  renderHUD();
+
+  const inCrossword = state.mode === 'crossword' && state.rs;
+  const inRound = state.mode && state.cur && state.rs;
+
+  if (inRound || inCrossword){
+    showScreen('game');
+    renderGame();
+    toast('Session resumed', 'good');
+  } else {
+    showScreen('start');
+  }
+})();
+</script>
+</body>
+</html>
